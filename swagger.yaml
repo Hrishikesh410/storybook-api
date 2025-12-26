@@ -1,0 +1,635 @@
+openapi: 3.0.3
+info:
+  title: Storybook Metadata API
+  version: 1.4.0
+  description: |
+    REST API for accessing Storybook component metadata.
+    
+    This API provides programmatic access to all your Storybook stories,
+    components, documentation, and code examples.
+    
+    **Features:**
+    - Get all stories with filtering capabilities
+    - List and search components
+    - Access component documentation
+    - Retrieve code examples and usage patterns
+    - CORS enabled for easy integration
+    
+    **Base URL:** `http://localhost:6006/api` (adjust port as needed)
+  contact:
+    name: Storybook API
+    url: https://github.com/Hrishikesh410/storybook-api
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:6006/api
+    description: Development server (default port)
+  - url: http://localhost:6007/api
+    description: Development server (alternative port)
+  - url: http://localhost:{port}/api
+    description: Custom port
+    variables:
+      port:
+        default: '6006'
+        description: Storybook server port
+
+tags:
+  - name: Health
+    description: API health and status
+  - name: Stories
+    description: Access and filter stories
+  - name: Components
+    description: Browse and search components
+  - name: Documentation
+    description: Component documentation
+  - name: Examples
+    description: Code examples and usage
+  - name: Search
+    description: Search functionality
+  - name: Legacy
+    description: Backward compatible endpoints
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Check if the API is running and metadata is available
+      operationId: getHealth
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                healthy:
+                  value:
+                    status: healthy
+                    timestamp: '2025-12-15T10:00:00.000Z'
+                    message: Storybook metadata API is running
+                    metadata:
+                      totalStories: 405
+                      generatedAt: '2025-12-15T09:59:00.000Z'
+                      storybookVersion: '8.0.0'
+                      extractedFrom: source-files
+                no-metadata:
+                  value:
+                    status: no-metadata
+                    timestamp: '2025-12-15T10:00:00.000Z'
+                    message: Metadata not generated yet. Run metadata extraction.
+                    metadata: null
+                    instructions:
+                      - 'Development: npm run metadata:dev'
+                      - 'Production: npm run build-storybook'
+
+  /stories:
+    get:
+      tags:
+        - Stories
+      summary: Get all stories
+      description: Retrieve all stories with optional filtering by title, tag, or kind
+      operationId: getStories
+      parameters:
+        - name: title
+          in: query
+          description: Filter by title (partial match, case-insensitive)
+          required: false
+          schema:
+            type: string
+          example: button
+        - name: tag
+          in: query
+          description: Filter by tag (exact match)
+          required: false
+          schema:
+            type: string
+          example: autodocs
+        - name: kind
+          in: query
+          description: Filter by kind (partial match, case-insensitive)
+          required: false
+          schema:
+            type: string
+          example: components
+      responses:
+        '200':
+          description: List of stories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoriesResponse'
+        '404':
+          description: Metadata not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /components:
+    get:
+      tags:
+        - Components
+      summary: List all components
+      description: Get a list of all unique components with story counts
+      operationId: getComponents
+      responses:
+        '200':
+          description: List of components
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentsResponse'
+              example:
+                total: 5
+                components:
+                  - id: components-button
+                    name: Components/Button
+                    title: Components/Button
+                    kind: Components/Button
+                    storyCount: 3
+                    tags:
+                      - autodocs
+                      - test
+                    importPath: ./src/Button.stories.tsx
+                    stories:
+                      - id: components-button--default
+                        name: Default
+                      - id: components-button--primary
+                        name: Primary
+        '404':
+          description: Metadata not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /components/{id}:
+    get:
+      tags:
+        - Components
+      summary: Get component by ID
+      description: Get detailed information about a specific component
+      operationId: getComponentById
+      parameters:
+        - name: id
+          in: path
+          description: Component ID (e.g., 'components-button')
+          required: true
+          schema:
+            type: string
+          example: components-button
+      responses:
+        '200':
+          description: Component details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentDetail'
+        '404':
+          description: Component not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Component not found
+                statusCode: 404
+                timestamp: '2025-12-15T10:00:00.000Z'
+                componentId: non-existent-component
+                suggestion: Use GET /api/components to see available components
+
+  /components/{id}/docs:
+    get:
+      tags:
+        - Documentation
+      summary: Get component documentation
+      description: Get documentation for a specific component
+      operationId: getComponentDocs
+      parameters:
+        - name: id
+          in: path
+          description: Component ID
+          required: true
+          schema:
+            type: string
+          example: components-button
+      responses:
+        '200':
+          description: Component documentation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentDocs'
+        '404':
+          description: Component not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /components/{id}/examples:
+    get:
+      tags:
+        - Examples
+      summary: Get component code examples
+      description: Get code examples and usage patterns for a component
+      operationId: getComponentExamples
+      parameters:
+        - name: id
+          in: path
+          description: Component ID
+          required: true
+          schema:
+            type: string
+          example: components-button
+      responses:
+        '200':
+          description: Code examples
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentExamples'
+        '404':
+          description: Component not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /search:
+    get:
+      tags:
+        - Search
+      summary: Search stories
+      description: Search across all stories and components
+      operationId: searchStories
+      parameters:
+        - name: q
+          in: query
+          description: Search query
+          required: true
+          schema:
+            type: string
+          example: button
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: Missing query parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Missing search query
+                statusCode: 400
+                timestamp: '2025-12-15T10:00:00.000Z'
+                usage: GET /api/search?q=button
+                example: http://localhost:6006/api/search?q=button
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, no-metadata]
+          description: API health status
+        timestamp:
+          type: string
+          format: date-time
+          description: Current timestamp
+        message:
+          type: string
+          description: Status message
+        metadata:
+          type: object
+          nullable: true
+          properties:
+            totalStories:
+              type: integer
+              description: Total number of stories
+            generatedAt:
+              type: string
+              format: date-time
+              description: When metadata was generated
+            storybookVersion:
+              type: string
+              description: Storybook version
+            extractedFrom:
+              type: string
+              description: Extraction method used
+        instructions:
+          type: array
+          items:
+            type: string
+          description: Instructions if metadata not available
+
+    StoriesResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of stories
+        filtered:
+          type: boolean
+          description: Whether results are filtered
+        stories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Story'
+        metadata:
+          $ref: '#/components/schemas/MetadataInfo'
+
+    Story:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Story ID
+        title:
+          type: string
+          description: Story title
+        name:
+          type: string
+          description: Story name
+        kind:
+          type: string
+          description: Story kind
+        story:
+          type: string
+          description: Story display name
+        importPath:
+          type: string
+          description: Source file path
+        tags:
+          type: array
+          items:
+            type: string
+          description: Story tags
+        args:
+          type: object
+          additionalProperties: true
+          description: Story arguments/props
+        argTypes:
+          type: object
+          additionalProperties: true
+          description: Argument type definitions
+        parameters:
+          type: object
+          additionalProperties: true
+          description: Story parameters
+        actions:
+          type: object
+          additionalProperties: true
+          description: Action handlers
+
+    ComponentsResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of components
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/Component'
+
+    Component:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Component ID
+        name:
+          type: string
+          description: Component name
+        title:
+          type: string
+          description: Component title
+        kind:
+          type: string
+          description: Component kind
+        storyCount:
+          type: integer
+          description: Number of stories
+        tags:
+          type: array
+          items:
+            type: string
+          description: Component tags
+        importPath:
+          type: string
+          description: Source file path
+        stories:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+
+    ComponentDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Component ID
+        name:
+          type: string
+          description: Component name
+        title:
+          type: string
+          description: Component title
+        kind:
+          type: string
+          description: Component kind
+        importPath:
+          type: string
+          description: Source file path
+        tags:
+          type: array
+          items:
+            type: string
+          description: Component tags
+        storyCount:
+          type: integer
+          description: Number of stories
+        args:
+          type: object
+          additionalProperties: true
+          description: Combined arguments from all stories
+        argTypes:
+          type: object
+          additionalProperties: true
+          description: Combined argument types
+        stories:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              story:
+                type: string
+              args:
+                type: object
+                additionalProperties: true
+              initialArgs:
+                type: object
+                additionalProperties: true
+              argTypes:
+                type: object
+                additionalProperties: true
+              parameters:
+                type: object
+                additionalProperties: true
+        component:
+          type: string
+          nullable: true
+          description: Component reference
+
+    ComponentDocs:
+      type: object
+      properties:
+        component:
+          type: string
+          description: Component name
+        description:
+          type: string
+          description: Component description
+        mdx:
+          type: string
+          description: MDX documentation content
+        sourceCode:
+          type: string
+          description: Component source code
+        argTypes:
+          type: object
+          additionalProperties: true
+          description: Argument type definitions
+        stories:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              args:
+                type: object
+                additionalProperties: true
+              argTypes:
+                type: object
+                additionalProperties: true
+              source:
+                type: string
+        parameters:
+          type: object
+          additionalProperties: true
+          description: Component parameters
+        tags:
+          type: array
+          items:
+            type: string
+          description: Component tags
+        importPath:
+          type: string
+          description: Source file path
+
+    ComponentExamples:
+      type: object
+      properties:
+        component:
+          type: string
+          description: Component name
+        importPath:
+          type: string
+          description: Source file path
+        sourceFile:
+          type: string
+          description: Source file name
+        examples:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Example name
+              description:
+                type: string
+                description: Example description
+              code:
+                type: string
+                description: Source code
+              args:
+                type: object
+                additionalProperties: true
+                description: Arguments used
+              argTypes:
+                type: object
+                additionalProperties: true
+                description: Argument types
+              usage:
+                type: string
+                description: Usage example (JSX/code)
+
+    SearchResponse:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Search query used
+        total:
+          type: integer
+          description: Number of results
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Story'
+
+    MetadataInfo:
+      type: object
+      properties:
+        generatedAt:
+          type: string
+          format: date-time
+          description: When metadata was generated
+        storybookVersion:
+          type: string
+          description: Storybook version
+        extractedFrom:
+          type: string
+          description: Extraction method used
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        statusCode:
+          type: integer
+          description: HTTP status code
+        timestamp:
+          type: string
+          format: date-time
+          description: Error timestamp
+      additionalProperties: true
+

@@ -1,0 +1,268 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Storybook Metadata API",
+    "version": "1.4.0",
+    "description": "REST API for accessing Storybook component metadata.\n\nThis API provides programmatic access to all your Storybook stories, components, documentation, and code examples.\n\n**Features:**\n- Get all stories with filtering capabilities\n- List and search components\n- Access component documentation\n- Retrieve code examples and usage patterns\n- CORS enabled for easy integration\n\n**Base URL:** `http://localhost:6006/api` (adjust port as needed)",
+    "contact": {
+      "name": "Storybook API",
+      "url": "https://github.com/Hrishikesh410/storybook-api"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:6006/api",
+      "description": "Development server (default port)"
+    },
+    {
+      "url": "http://localhost:6007/api",
+      "description": "Development server (alternative port)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health",
+      "description": "API health and status"
+    },
+    {
+      "name": "Stories",
+      "description": "Access and filter stories"
+    },
+    {
+      "name": "Components",
+      "description": "Browse and search components"
+    },
+    {
+      "name": "Documentation",
+      "description": "Component documentation"
+    },
+    {
+      "name": "Examples",
+      "description": "Code examples and usage"
+    },
+    {
+      "name": "Search",
+      "description": "Search functionality"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check",
+        "description": "Check if the API is running and metadata is available",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "API is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": ["healthy", "no-metadata"]
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "totalStories": { "type": "integer" },
+                        "generatedAt": { "type": "string", "format": "date-time" },
+                        "storybookVersion": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stories": {
+      "get": {
+        "tags": ["Stories"],
+        "summary": "Get all stories",
+        "description": "Retrieve all stories with optional filtering",
+        "operationId": "getStories",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "description": "Filter by title",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "description": "Filter by tag",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "description": "Filter by kind",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of stories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": { "type": "integer" },
+                    "filtered": { "type": "boolean" },
+                    "stories": {
+                      "type": "array",
+                      "items": { "type": "object" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Metadata not found"
+          }
+        }
+      }
+    },
+    "/components": {
+      "get": {
+        "tags": ["Components"],
+        "summary": "List all components",
+        "operationId": "getComponents",
+        "responses": {
+          "200": {
+            "description": "List of components",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": { "type": "integer" },
+                    "components": {
+                      "type": "array",
+                      "items": { "type": "object" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/components/{id}": {
+      "get": {
+        "tags": ["Components"],
+        "summary": "Get component by ID",
+        "operationId": "getComponentById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "components-button"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component details"
+          },
+          "404": {
+            "description": "Component not found"
+          }
+        }
+      }
+    },
+    "/components/{id}/docs": {
+      "get": {
+        "tags": ["Documentation"],
+        "summary": "Get component documentation",
+        "operationId": "getComponentDocs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component documentation"
+          },
+          "404": {
+            "description": "Component not found"
+          }
+        }
+      }
+    },
+    "/components/{id}/examples": {
+      "get": {
+        "tags": ["Examples"],
+        "summary": "Get component code examples",
+        "operationId": "getComponentExamples",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Code examples"
+          },
+          "404": {
+            "description": "Component not found"
+          }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "tags": ["Search"],
+        "summary": "Search stories",
+        "operationId": "searchStories",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "button"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results"
+          },
+          "400": {
+            "description": "Missing query parameter"
+          }
+        }
+      }
+    }
+  }
+}
+

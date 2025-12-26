@@ -1,0 +1,74 @@
+{
+  "name": "storybook-api",
+  "version": "1.0.1",
+  "description": "Extract and expose Storybook component metadata via REST API. Works with any framework (React, Vue, Angular, Svelte, etc.)",
+  "type": "module",
+  "main": "extract-metadata.js",
+  "exports": {
+    ".": "./extract-metadata.js",
+    "./middleware": "./middleware.js",
+    "./middleware.cjs": "./middleware.cjs",
+    "./setup": "./setup.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "storybook-api-setup": "setup.js"
+  },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "extract-metadata.js",
+    "middleware.js",
+    "middleware.cjs",
+    "setup.js",
+    "swagger.yaml",
+    "swagger.json",
+    "test-api.sh",
+    "examples/"
+  ],
+  "scripts": {
+    "setup": "node setup.js",
+    "test": "./test-api.sh",
+    "prepublishOnly": "echo '\n⚠️  Publishing to npm...\nVersion: 1.0.0\n'"
+  },
+  "keywords": [
+    "storybook",
+    "metadata",
+    "extractor",
+    "rest-api",
+    "api",
+    "components",
+    "documentation",
+    "component-library",
+    "design-system",
+    "react",
+    "vue",
+    "angular",
+    "svelte",
+    "web-components",
+    "openapi",
+    "swagger",
+    "storybook-addon",
+    "component-metadata",
+    "design-tokens"
+  ],
+  "author": "Hrishikesh Joshi (Software Developer)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hrishikesh410/storybook-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Hrishikesh410/storybook-api/issues"
+  },
+  "homepage": "https://github.com/Hrishikesh410/storybook-api#readme",
+  "dependencies": {
+    "@babel/parser": "^7.23.0",
+    "@babel/traverse": "^7.23.0",
+    "@babel/types": "^7.23.0",
+    "glob": "^10.3.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

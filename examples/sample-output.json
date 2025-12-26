@@ -1,0 +1,220 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2024-12-11T10:30:00.000Z",
+  "extractedFrom": "running-storybook",
+  "storybookVersion": "8.3.6",
+  "totalStories": 3,
+  "stories": {
+    "components-button--primary": {
+      "id": "components-button--primary",
+      "title": "Components/Button",
+      "name": "Primary",
+      "kind": "Components/Button",
+      "story": "Primary",
+      "importPath": "src/components/Button/Button.stories.tsx",
+      "tags": ["autodocs", "component"],
+      "args": {
+        "variant": "primary",
+        "size": "medium",
+        "label": "Click me",
+        "disabled": false
+      },
+      "initialArgs": {
+        "variant": "primary",
+        "size": "medium",
+        "label": "Click me"
+      },
+      "argTypes": {
+        "variant": {
+          "name": "variant",
+          "description": "The visual style variant of the button",
+          "type": "string",
+          "defaultValue": "primary",
+          "control": {
+            "type": "select",
+            "options": ["primary", "secondary", "tertiary"]
+          },
+          "table": {
+            "category": "appearance",
+            "type": "string",
+            "defaultValue": "primary"
+          }
+        },
+        "size": {
+          "name": "size",
+          "description": "The size of the button",
+          "type": "string",
+          "defaultValue": "medium",
+          "control": {
+            "type": "select",
+            "options": ["small", "medium", "large"]
+          },
+          "table": {
+            "category": "appearance",
+            "type": "string",
+            "defaultValue": "medium"
+          }
+        },
+        "label": {
+          "name": "label",
+          "description": "The text displayed on the button",
+          "type": "string",
+          "defaultValue": "",
+          "control": {
+            "type": "text"
+          },
+          "table": {
+            "category": "content",
+            "type": "string"
+          }
+        },
+        "disabled": {
+          "name": "disabled",
+          "description": "Whether the button is disabled",
+          "type": "boolean",
+          "defaultValue": "false",
+          "control": {
+            "type": "boolean"
+          },
+          "table": {
+            "category": "state",
+            "type": "boolean"
+          }
+        }
+      },
+      "actions": {
+        "onClick": {
+          "name": "onClick",
+          "description": "Called when the button is clicked",
+          "action": "clicked"
+        }
+      },
+      "docs": {
+        "description": "Primary button component for main actions",
+        "extractedComment": ""
+      },
+      "source": "<Button\n  variant=\"primary\"\n  size=\"medium\"\n  label=\"Click me\"\n  onClick={action('clicked')}\n/>",
+      "parameters": {
+        "fileName": "src/components/Button/Button.stories.tsx",
+        "design": {
+          "type": "figma",
+          "url": "https://www.figma.com/file/example"
+        },
+        "backgrounds": null,
+        "viewport": null,
+        "layout": "centered",
+        "a11y": null
+      },
+      "component": {
+        "displayName": "Button",
+        "description": "A customizable button component",
+        "props": {
+          "variant": {
+            "type": "string",
+            "required": false,
+            "description": "Button variant"
+          },
+          "size": {
+            "type": "string",
+            "required": false,
+            "description": "Button size"
+          }
+        }
+      }
+    },
+    "components-button--secondary": {
+      "id": "components-button--secondary",
+      "title": "Components/Button",
+      "name": "Secondary",
+      "kind": "Components/Button",
+      "story": "Secondary",
+      "importPath": "src/components/Button/Button.stories.tsx",
+      "tags": ["autodocs"],
+      "args": {
+        "variant": "secondary",
+        "size": "medium",
+        "label": "Click me"
+      },
+      "initialArgs": {
+        "variant": "secondary",
+        "size": "medium",
+        "label": "Click me"
+      },
+      "argTypes": {
+        "variant": {
+          "name": "variant",
+          "description": "The visual style variant of the button",
+          "type": "string",
+          "defaultValue": "primary",
+          "control": {
+            "type": "select",
+            "options": ["primary", "secondary", "tertiary"]
+          }
+        }
+      },
+      "actions": {
+        "onClick": {
+          "name": "onClick",
+          "description": "Called when the button is clicked"
+        }
+      },
+      "docs": {
+        "description": "Secondary button for less prominent actions"
+      },
+      "source": "<Button variant=\"secondary\" label=\"Click me\" />",
+      "parameters": {
+        "fileName": "src/components/Button/Button.stories.tsx",
+        "layout": "centered"
+      }
+    },
+    "components-input--default": {
+      "id": "components-input--default",
+      "title": "Components/Input",
+      "name": "Default",
+      "kind": "Components/Input",
+      "story": "Default",
+      "importPath": "src/components/Input/Input.stories.tsx",
+      "tags": ["autodocs"],
+      "args": {
+        "placeholder": "Enter text...",
+        "type": "text"
+      },
+      "argTypes": {
+        "placeholder": {
+          "name": "placeholder",
+          "type": "string",
+          "control": {
+            "type": "text"
+          }
+        },
+        "type": {
+          "name": "type",
+          "type": "string",
+          "control": {
+            "type": "select",
+            "options": ["text", "email", "password", "number"]
+          }
+        }
+      },
+      "actions": {
+        "onChange": {
+          "name": "onChange",
+          "description": "Called when input value changes"
+        },
+        "onFocus": {
+          "name": "onFocus",
+          "description": "Called when input receives focus"
+        }
+      },
+      "docs": {
+        "description": "Basic text input component"
+      },
+      "source": "<Input placeholder=\"Enter text...\" type=\"text\" />",
+      "parameters": {
+        "fileName": "src/components/Input/Input.stories.tsx",
+        "layout": "padded"
+      }
+    }
+  }
+}
+
